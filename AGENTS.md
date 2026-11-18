@@ -6,10 +6,10 @@
 
 | 仓库 | 本地路径 | 远程 | 说明 |
 |---|---|---|---|
-| credit-platform（本工程） | `credit-platform/` | 暂无远程、**未纳入 Git** | 基础设施与文档 |
-| scaff-credit-agents（原子智能体） | `scaff-credit-agents/` | `https://github.com/pandq-certer/scaff-credit-agents`（main） | Java 多模块，已纳入 Git |
+| credit-platform（本工程） | `credit-platform/` | `https://github.com/pandq-certer/credit-platform`（main） | 基础设施与文档，已纳入 Git |
+| scaff-credit-agents（原子智能体） | `scaff-credit-agents/` | `https://github.com/pandq-certer/scaff-credit-agents`（main） | Java 多模块，独立仓库 |
 
-两个目录平级，互不混入；改原子智能体只允许动 Real Provider 适配器与 `application.yml`。
+> 两个仓库各自独立版本管理；本仓库根为工作区目录，`scaff-credit-agents/` 已被 `.gitignore` 排除。
 
 ## 2. 技术栈
 
