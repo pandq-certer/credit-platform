@@ -1,0 +1,12 @@
+NAME                 STATUS
+sys00-etcd           Up About a minute (healthy)
+sys00-ferretdb       Up About a minute (healthy)
+sys00-ferretdb-pg    Up 4 minutes (healthy)
+sys00-grafana        Up About a minute (healthy)
+sys00-mysql          Up 4 hours (healthy)
+sys00-opensearch     Up 4 hours (healthy)
+sys00-postgres       Up 4 hours (healthy)
+sys00-prometheus     Up About a minute (healthy)
+sys00-seaweedfs      Up 20 seconds (healthy)
+sys00-valkey-cache   Up 4 hours (healthy)
+sys00-valkey-queue   Up 4 hours (healthy)

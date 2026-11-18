@@ -1,0 +1,17 @@
+# 阶段三 原子智能体 real Provider 冒烟（SYS-01 8101）
+# 时间: 2026-11-17 14:12:36
+# 启动参数: --spring.cloud.nacos.discovery.enabled=false（本机无 Nacos，仅验证 Provider 映射）
+
+$ curl -s http://127.0.0.1:18101/api/bai/ocr/health
+{"requestId":"health","code":"0","message":"success","data":"UP","traceId":null}
+
+$ curl -X POST http://127.0.0.1:18101/api/bai/ocr/recognize?docType=ID_CARD -F image=@sample.jpg
+{"code": "0", "ocrId": "p3-ocr-evidence", "status": "SUCCESS", "qualityScore": 0.893, "elapsedMs": 22087, "blocks": 20, "firstBlock": {"text": "个人经营性贷款申请表", "confidence": 0.973037, "bbox": [0.067715, 0.070115, 0.465538, 0.108166], "flag": null, "flagReason": null}}
+
+$ curl -X POST http://127.0.0.1:18143/api/bai/docparse/parse?docType=loan_application -F file=@sample.jpg
+{"code": "0", "docId": "DOC202611171413210002", "docType": "loan_application", "layout": 12, "readingOrder": 6, "kv": {"loan_term": {"value": "36个月", "confidence": 0.96, "page": 1, "region": "PARAGRAPH"}}, "validation": {"lowConfidenceFields": ["contract_no", "borrower_name", "loan_amount", "loan_rate"], "needReview": true}, "firstParagraph": "个人经营性贷款申请表"}
+
+$ curl -X POST http://127.0.0.1:18155/api/bai/image/quality -F file=@sample.jpg
+{"code": "0", "quality": {"clarity": 1.0, "brightness": 0.57, "contrast": 0.57, "blur": 0.0, "occlusion": 0.0, "score": 0.893, "usable": true, "suggestion": "ACCEPT"}}
+$ curl -X POST http://127.0.0.1:18155/api/bai/image/quality -F file=@blur.jpg
+{"code": "0", "quality": {"clarity": 0.0, "brightness": 0.57, "contrast": 0.3, "blur": 1.0, "occlusion": 0.0, "score": 0.593, "usable": false, "suggestion": "REJECT"}}

@@ -1,0 +1,22 @@
+{
+  "index_patterns": ["credit_*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "analysis": {
+        "analyzer": {
+          "cn_text": { "type": "custom", "tokenizer": "ik_max_word", "filter": ["lowercase"] }
+        }
+      }
+    },
+    "mappings": {
+      "properties": {
+        "title":   { "type": "text", "analyzer": "cn_text" },
+        "content": { "type": "text", "analyzer": "cn_text" },
+        "tenant":  { "type": "keyword" },
+        "scene":   { "type": "keyword" }
+      }
+    }
+  }
+}

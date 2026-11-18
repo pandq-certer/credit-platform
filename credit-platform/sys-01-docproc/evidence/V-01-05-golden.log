@@ -1,0 +1,22 @@
+scans/page-001.jpg: chars=185 acc=1.0000
+scans/page-002.jpg: chars=205 acc=0.9902
+scans/page-003.jpg: chars=323 acc=1.0000
+scans/page-004.jpg: chars=179 acc=0.9888
+scans/page-005.jpg: chars=190 acc=1.0000
+scans/page-006.jpg: chars=225 acc=1.0000
+scans/page-007.jpg: chars=172 acc=0.9884
+scans/page-008.jpg: chars=131 acc=0.9924
+scans/page-009.jpg: chars=117 acc=0.9744
+scans/page-010.jpg: chars=133 acc=0.9774
+scans/page-011.jpg: chars=89 acc=0.9438
+scans/page-012.jpg: chars=87 acc=1.0000
+scans/page-013.jpg: chars=95 acc=0.8737
+scans/page-014.jpg: chars=153 acc=0.9935
+scans/page-015.jpg: chars=118 acc=0.8475
+scans/page-016.jpg: chars=151 acc=0.9934
+scans/page-017.jpg: chars=85 acc=1.0000
+scans/page-018.jpg: chars=205 acc=0.8732
+scans/page-019.jpg: chars=77 acc=0.9870
+scans/page-020.jpg: chars=117 acc=1.0000
+weighted_char_accuracy=0.9746 threshold=0.98 -> FAIL
+EXIT=1

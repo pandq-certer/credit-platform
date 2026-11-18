@@ -1,0 +1,25 @@
+# 独立仓库：原子智能体单独管理，不并入本仓库
+scaff-credit-agents/
+
+# 密钥与环境（仅保留模板）
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p12
+
+# 运行时数据与模型
+credit-platform/sys-01-docproc/data/
+**/__pycache__/
+*.pyc
+
+# 系统与 IDE
+.DS_Store
+.idea/
+*.iml
+.vscode/
+
+# 临时日志目录（evidence/ 下的验证日志为交付物，需保留）
+logs/

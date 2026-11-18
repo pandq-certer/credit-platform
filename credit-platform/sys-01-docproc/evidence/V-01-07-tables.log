@@ -1,0 +1,7 @@
+/Users/pandq/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+跨页续表(10+11): expected 7x5 got 7x5 shape=1.0 text_sim=0.9798 score=0.9899
+合并表头(15): expected 4x4 got 4x4 shape=1.0 text_sim=0.8636 score=0.9318
+财务多列表(6): expected 8x4 got 8x4 shape=1.0 text_sim=1.0000 score=1.0000
+税务多列表(7): expected 7x4 got 7x4 shape=1.0 text_sim=0.9921 score=0.9961
+mean_table_score=0.9794 threshold=0.90 -> PASS

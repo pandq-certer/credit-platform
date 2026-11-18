@@ -1,0 +1,219 @@
+name: credit-sys-00
+
+services:
+  postgres:
+    image: library/postgres:18.7
+    container_name: sys00-postgres
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+    command:
+      - postgres
+      - -c
+      - max_connections=300
+      - -c
+      - shared_buffers=1GB
+      - -c
+      - effective_cache_size=4GB
+      - -c
+      - archive_mode=off
+      - -c
+      - log_min_duration_statement=1000
+      - -c
+      - log_checkpoints=on
+    ports: ["5432:5432"]
+    volumes:
+      - vol-sys00-pg:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mysql:
+    image: library/mysql:8.4.13
+    container_name: sys00-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set in .env}
+    command: --mysql-native-password=OFF --log-error-verbosity=1
+    ports: ["3306:3306"]
+    volumes:
+      - vol-sys00-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # FerretDB 2.x 必需：PostgreSQL + DocumentDB 扩展（普通 postgres 镜像不满足）
+  ferretdb-pg:
+    image: ghcr.io/ferretdb/postgres-documentdb:17
+    container_name: sys00-ferretdb-pg
+    environment:
+      POSTGRES_USER: ferretdb
+      POSTGRES_PASSWORD: ${FERRETDB_PASSWORD:?set in .env}
+      POSTGRES_DB: postgres
+    volumes:
+      - vol-sys00-ferretdb-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ferretdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  ferretdb:
+    image: ferretdb/ferretdb:2.7.0
+    container_name: sys00-ferretdb
+    command:
+      - --postgresql-url=postgres://ferretdb:${FERRETDB_PASSWORD}@ferretdb-pg:5432/postgres
+      - --listen-addr=0.0.0.0:27017
+      - --no-auth                         # 单机开发期关闭认证；二期开 auth 并建用户
+    ports: ["27017:27017"]
+    depends_on:
+      ferretdb-pg:
+        condition: service_healthy
+
+  valkey-cache:
+    image: valkey/valkey:9.0.7
+    container_name: sys00-valkey-cache
+    command:
+      - valkey-server
+      - --maxmemory
+      - 2gb
+      - --maxmemory-policy
+      - allkeys-lru
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  valkey-queue:
+    image: valkey/valkey:9.0.7
+    container_name: sys00-valkey-queue
+    command:
+      - valkey-server
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+      - --maxmemory-policy
+      - noeviction
+      - --save
+      - ""
+    ports: ["6380:6379"]
+    volumes:
+      - vol-sys00-valkey-q:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  opensearch:
+    image: opensearchproject/opensearch:3.9.0
+    container_name: sys00-opensearch
+    environment:
+      discovery.type: single-node
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:?set in .env}
+      plugins.security.disabled: "true"   # 开发期关闭安全插件；生产必须开启并配 TLS
+      OPENSEARCH_JAVA_OPTS: -Xms1g -Xmx1g
+    ports: ["9200:9200", "9300:9300"]
+    volumes:
+      - vol-sys00-os:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s localhost:9200/_cluster/health | grep -q '\"status\"'"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:3.96@sha256:a35a92243aefd043b974ec3ebcc0e9511efb49894339f6c1ece087b44eb52b3b
+    container_name: sys00-seaweedfs
+    command:
+      - server
+      - -dir=/data
+      - -master.volumeSizeLimitMB=1024
+      - -volume.max=0
+      - -filer
+      - -s3
+      - -s3.port=8333
+      - -s3.config=/etc/seaweedfs/s3.json
+    ports: ["9333:9333", "8333:8333"]
+    volumes:
+      - vol-sys00-seaweed:/data
+      - ./secrets/seaweedfs-s3.json:/etc/seaweedfs/s3.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9333/cluster/healthz >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.7.3
+    container_name: sys00-etcd
+    environment:
+      ETCD_NAME: sys00-etcd
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd:2380
+      ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
+      ETCD_INITIAL_CLUSTER: sys00-etcd=http://etcd:2380
+    ports: ["2379:2379", "2380:2380"]
+    volumes:
+      - vol-sys00-etcd:/etcd-data
+    command: etcd --data-dir=/etcd-data
+    healthcheck:
+      test: ["CMD", "etcdctl", "--endpoints=http://127.0.0.1:2379", "endpoint", "health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  prometheus:
+    image: prom/prometheus:v3.16.0
+    container_name: sys00-prometheus
+    ports: ["9090:9090"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - vol-sys00-prom:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  grafana:
+    image: grafana/grafana:13.3.1
+    container_name: sys00-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set in .env}
+      GF_SERVER_ROOT_URL: http://localhost:3000
+    ports: ["3000:3000"]
+    volumes:
+      - vol-sys00-grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      - prometheus
+
+volumes:
+  vol-sys00-pg:
+  vol-sys00-ferretdb-pg:
+  vol-sys00-mysql:
+  vol-sys00-valkey-q:
+  vol-sys00-os:
+  vol-sys00-seaweed:
+  vol-sys00-etcd:
+  vol-sys00-prom:
+  vol-sys00-grafana:

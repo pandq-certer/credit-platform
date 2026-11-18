@@ -1,0 +1,53 @@
+name: credit-sys-01
+
+services:
+  ocr:
+    platform: linux/amd64      # 规避 paddlepaddle arm64 在 >1000px 输入的 Conv 段错误
+    build:
+      context: ./ocr_server
+    image: credit/sys01-ocr:1.0.0
+    container_name: sys01-ocr
+    ports: ["8101:8101"]
+    volumes:
+      - vol-sys01-models:/models
+      - ./data/tmp:/data/tmp
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8101/healthz >/dev/null"]
+      interval: 20s
+      timeout: 5s
+      retries: 15
+
+  parse:
+    build:
+      context: ./parse_server
+    image: credit/sys01-parse:1.0.0
+    container_name: sys01-parse
+    environment:
+      SYS01_OCR_URL: http://ocr:8101
+      SYS01_DB_DSN: postgresql://credit_sys01:${CREDIT_SYS01_PASSWORD:?set in .env}@postgres:5432/credit_sys01
+      SYS01_TMP_DIR: /data/tmp
+      HF_ENDPOINT: https://hf-mirror.com
+      HF_HOME: /models/hf
+    ports: ["8102:8102"]
+    volumes:
+      - ./data/tmp:/data/tmp
+      - ./data/hf:/models/hf
+    depends_on:
+      ocr:
+        condition: service_healthy
+    networks:
+      - default
+      - sys00
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8102/healthz >/dev/null"]
+      interval: 20s
+      timeout: 5s
+      retries: 15
+
+networks:
+  sys00:
+    external: true
+    name: credit-sys-00_default
+
+volumes:
+  vol-sys01-models:

@@ -1,0 +1,14 @@
+server: { host: 0.0.0.0, port: 8101, workers: 2 }
+ocr:
+  model: PP-OCRv5_server
+  lang: ch
+  ocr_version: PP-OCRv5
+  use_gpu: false          # 单机 CPU 起步；有 GPU 改 true
+  det_limit_side_len: 2000
+  det_db_box_thresh: 0.5
+  drop_score: 0.5
+  return_word_box: true
+preprocess: { deskew: true, denoise: false, max_side: 3000 }
+quality:
+  min_score: 0.6          # 低于则返回 40003 退回
+refuse_reasons: [BLUR, SKEW, TOO_DARK, LOW_DPI, GLARE]

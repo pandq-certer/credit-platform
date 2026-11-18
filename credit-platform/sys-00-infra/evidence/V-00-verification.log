@@ -1,0 +1,41 @@
+SYS-00 verification 2026-11-16T13:38:49Z
+### V-00-01
+NAME                 STATUS
+sys00-etcd           Up 4 hours
+sys00-ferretdb       Up 15 seconds (healthy)
+sys00-ferretdb-pg    Up 2 minutes (healthy)
+sys00-grafana        Up 21 minutes
+sys00-mysql          Up 4 hours (healthy)
+sys00-opensearch     Up 4 hours (healthy)
+sys00-postgres       Up 4 hours (healthy)
+sys00-prometheus     Up 4 hours
+sys00-seaweedfs      Up 4 hours
+sys00-valkey-cache   Up 4 hours (healthy)
+sys00-valkey-queue   Up 4 hours (healthy)
+### V-00-02
+127.0.0.1:5432 - accepting connections
+### V-00-03
+1
+1
+### V-00-04
+PONG
+### V-00-05
+aof_enabled:1
+### V-00-06
+{"cluster_name":"docker-cluster","status":"green","timed_out":false,"number_of_nodes":1,"number_of_data_nodes":1,"discovered_master":true,"discovered_cluster_manager":true,"active_primary_shards":3,"active_shards":3,"relocating_shards":0,"initializing_shards":0,"unassigned_shards":0,"delayed_unassigned_shards":0,"number_of_pending_tasks":0,"number_of_in_flight_fetch":0,"task_max_waiting_in_queue_millis":0,"active_shards_percent_as_number":100.0}
+### V-00-07
+OK
+smoke
+ok
+### V-00-08
+healthz_http=200
+      13
+### V-00-09
+Prometheus Server is Healthy.
+
+### V-00-10
+{
+  "database": "ok",
+  "version": "13.3.1",
+  "commit": "da3aa3ff574e7dbbf808c66b6daa744defed0441"
+}

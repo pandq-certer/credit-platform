@@ -1,0 +1,11 @@
+### V-01-03 scanned PDF
+http=200 time=57.837815s
+pages 2 blocks 16 tables 2 md_chars 575
+## 个人经营性贷款申请表  身份证号：310101198801011234  申请姓名：张伟  申请额：民币500,000元 期限：36个  经营主体：上海示
+### V-01-04 formats
+sample.docx http=200 blocks 3 tables 1
+sample.html http=200 blocks 3 tables 1
+sample.xlsx http=200 blocks 0 tables 1
+### V-01-08 encrypted
+{"error_code":40004,"message":"encrypted PDF","trace_id":"d707dbbbc0214613b67159e3c4e6f730","needs_manual":true}
+http=400

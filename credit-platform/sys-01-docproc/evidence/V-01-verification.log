@@ -1,0 +1,8 @@
+### V-01-01
+{"status":"ok","model":"PP-OCRv5_server"}
+### V-01-02 contract
+keys ['bbox', 'block_id', 'confidence', 'page', 'parser', 'polygon', 'text', 'trace_id']
+bbox [0.067715, 0.070115, 0.465538, 0.108166] polygon [[0.067715, 0.070543], [0.465538, 0.070115], [0.465538, 0.107738], [0.067715, 0.108166]] conf 0.973037 trace 5491390e8f7e4d04bac6e161d8c63f2c
+### V-01-07 quality gate
+blur_http=400
+dark_http=400

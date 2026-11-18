@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # 后续按系统追加抓取目标（示例）：
+  # - job_name: sys01-ocr
+  #   static_configs:
+  #     - targets: ["host.docker.internal:8101"]
+  # - job_name: sys01-parse
+  #   static_configs:
+  #     - targets: ["host.docker.internal:8102"]
